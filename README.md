@@ -1,4 +1,4 @@
-# Cheating Daddy
+# Cluely Clone
 
 > [!NOTE]  
 > Use latest MacOS and Windows version, older versions have limited support
