@@ -7,6 +7,7 @@ import { HistoryView } from '../views/HistoryView.js';
 import { AssistantView } from '../views/AssistantView.js';
 import { OnboardingView } from '../views/OnboardingView.js';
 import { AdvancedView } from '../views/AdvancedView.js';
+import { TicTacToeView } from '../views/TicTacToeView.js';
 
 export class CheatingDaddyApp extends LitElement {
     static styles = css`
@@ -227,8 +228,13 @@ export class CheatingDaddyApp extends LitElement {
         this.requestUpdate();
     }
 
+    handleTicTacToeClick() {
+        this.currentView = 'tictactoe';
+        this.requestUpdate();
+    }
+
     async handleClose() {
-        if (this.currentView === 'customize' || this.currentView === 'help' || this.currentView === 'history') {
+        if (this.currentView === 'customize' || this.currentView === 'help' || this.currentView === 'history' || this.currentView === 'tictactoe') {
             this.currentView = 'main';
         } else if (this.currentView === 'assistant') {
             if (window.cheddar) {
@@ -434,6 +440,9 @@ export class CheatingDaddyApp extends LitElement {
             case 'advanced':
                 return html` <advanced-view></advanced-view> `;
 
+            case 'tictactoe':
+                return html` <tictactoe-view></tictactoe-view> `;
+
             case 'assistant':
                 return html`
                     <assistant-view
@@ -467,6 +476,7 @@ export class CheatingDaddyApp extends LitElement {
                         .onHelpClick=${() => this.handleHelpClick()}
                         .onHistoryClick=${() => this.handleHistoryClick()}
                         .onAdvancedClick=${() => this.handleAdvancedClick()}
+                        .onTicTacToeClick=${() => this.handleTicTacToeClick()}
                         .onCloseClick=${() => this.handleClose()}
                         .onBackClick=${() => this.handleBackClick()}
                         .onHideToggleClick=${() => this.handleHideToggle()}

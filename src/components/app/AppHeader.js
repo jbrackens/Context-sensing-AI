@@ -95,6 +95,7 @@ export class AppHeader extends LitElement {
         onCustomizeClick: { type: Function },
         onHelpClick: { type: Function },
         onHistoryClick: { type: Function },
+        onTicTacToeClick: { type: Function },
         onCloseClick: { type: Function },
         onBackClick: { type: Function },
         onHideToggleClick: { type: Function },
@@ -111,6 +112,7 @@ export class AppHeader extends LitElement {
         this.onCustomizeClick = () => {};
         this.onHelpClick = () => {};
         this.onHistoryClick = () => {};
+        this.onTicTacToeClick = () => {};
         this.onCloseClick = () => {};
         this.onBackClick = () => {};
         this.onHideToggleClick = () => {};
@@ -180,6 +182,7 @@ export class AppHeader extends LitElement {
             help: 'Help & Shortcuts',
             history: 'Conversation History',
             advanced: 'Advanced Tools',
+            tictactoe: 'Tic-Tac-Toe',
             assistant: 'Cheating Daddy',
         };
         return titles[this.currentView] || 'Cheating Daddy';
@@ -194,7 +197,7 @@ export class AppHeader extends LitElement {
     }
 
     isNavigationView() {
-        const navigationViews = ['customize', 'help', 'history', 'advanced'];
+        const navigationViews = ['customize', 'help', 'history', 'advanced', 'tictactoe'];
         return navigationViews.includes(this.currentView);
     }
 
@@ -251,6 +254,23 @@ export class AppHeader extends LitElement {
                                           stroke-linecap="round"
                                           stroke-linejoin="round"
                                       ></path>
+                                  </svg>
+                              </button>
+                              <button class="icon-button" @click=${this.onTicTacToeClick} title="Tic-Tac-Toe Game">
+                                  <?xml version="1.0" encoding="UTF-8"?><svg
+                                      width="24px"
+                                      height="24px"
+                                      stroke-width="1.7"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      color="currentColor"
+                                  >
+                                      <path d="M3 8L21 8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+                                      <path d="M3 16L21 16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+                                      <path d="M8 3L8 21" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+                                      <path d="M16 3L16 21" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+                                      <circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="1.7"></circle>
                                   </svg>
                               </button>
                               ${this.advancedMode
