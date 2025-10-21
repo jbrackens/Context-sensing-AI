@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe Game</title>
+    <style>
+        :root {
+            --background-color: #1a1a2e;
+            --card-background: rgba(255, 255, 255, 0.04);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-color: #ffffff;
+            --description-color: rgba(255, 255, 255, 0.75);
+            --accent-color: #007aff;
+            --link-hover-color: #ff9500;
+            --input-background: rgba(0, 0, 0, 0.2);
+            --input-hover-background: rgba(0, 0, 0, 0.3);
+            --input-border: rgba(255, 255, 255, 0.1);
+            --button-background: #007aff;
+            --icon-size: 24px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #007aff 0%, #ff9500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: var(--description-color);
+            font-size: 14px;
+        }
+    </style>
+    <script type="module">
+        // Import Lit from CDN
+        import { html, css, LitElement } from 'https://cdn.jsdelivr.net/gh/lit/dist@2.7.4/core/lit-core.min.js';
+
+        class TicTacToeView extends LitElement {
+            static styles = css`
+                * {
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                    cursor: default;
+                    user-select: none;
+                }
+
+                :host {
+                    display: block;
+                    padding: 12px;
+                }
+
+                .game-container {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 16px;
+                    padding-bottom: 20px;
+                }
+
+                .game-header {
+                    text-align: center;
+                    width: 100%;
+                }
+
+                .game-title {
+                    color: var(--text-color);
+                    font-size: 20px;
+                    font-weight: 700;
+                    margin-bottom: 8px;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                }
+
+                .game-status {
+                    color: var(--description-color, rgba(255, 255, 255, 0.75));
+                    font-size: 14px;
+                    font-weight: 500;
+                    min-height: 24px;
+                }
+
+                .game-status.winner {
+                    color: var(--accent-color, #007aff);
+                    font-size: 16px;
+                    font-weight: 600;
+                }
+
+                .game-status.draw {
+                    color: var(--link-hover-color, #ff9500);
+                    font-size: 16px;
+                    font-weight: 600;
+                }
+
+                .game-board {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    grid-template-rows: repeat(3, 1fr);
+                    gap: 8px;
+                    padding: 16px;
+                    background: var(--card-background, rgba(255, 255, 255, 0.04));
+                    border: 1px solid var(--card-border, rgba(255, 255, 255, 0.1));
+                    border-radius: 12px;
+                    backdrop-filter: blur(10px);
+                }
+
+                .cell {
+                    width: 80px;
+                    height: 80px;
+                    background: var(--input-background, rgba(0, 0, 0, 0.2));
+                    border: 2px solid var(--input-border, rgba(255, 255, 255, 0.1));
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 32px;
+                    font-weight: 700;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    color: var(--text-color);
+                }
+
+                .cell:hover:not(.filled) {
+                    background: var(--input-hover-background, rgba(0, 0, 0, 0.3));
+                    border-color: var(--accent-color, #007aff);
+                    transform: scale(1.05);
+                }
+
+                .cell.filled {
+                    cursor: not-allowed;
+                }
+
+                .cell.x {
+                    color: var(--accent-color, #007aff);
+                }
+
+                .cell.o {
+                    color: var(--link-hover-color, #ff9500);
+                }
+
+                .cell.winner {
+                    background: var(--accent-color, #007aff);
+                    color: white;
+                    animation: pulse 0.5s ease;
+                }
+
+                @keyframes pulse {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.1); }
+                }
+
+                .controls {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 12px;
+                    width: 100%;
+                    max-width: 320px;
+                }
+
+                .scoreboard {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr 1fr;
+                    gap: 8px;
+                    background: var(--card-background, rgba(255, 255, 255, 0.04));
+                    border: 1px solid var(--card-border, rgba(255, 255, 255, 0.1));
+                    border-radius: 8px;
+                    padding: 12px;
+                }
+
+                .score-item {
+                    text-align: center;
+                    padding: 8px;
+                    background: var(--input-background, rgba(0, 0, 0, 0.2));
+                    border-radius: 6px;
+                }
+
+                .score-label {
+                    font-size: 10px;
+                    color: var(--description-color, rgba(255, 255, 255, 0.6));
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    margin-bottom: 4px;
+                }
+
+                .score-value {
+                    font-size: 18px;
+                    font-weight: 700;
+                    color: var(--text-color);
+                }
+
+                .score-item.x .score-value {
+                    color: var(--accent-color, #007aff);
+                }
+
+                .score-item.o .score-value {
+                    color: var(--link-hover-color, #ff9500);
+                }
+
+                .button {
+                    padding: 10px 16px;
+                    background: var(--accent-color, #007aff);
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+
+                .button:hover {
+                    background: #0056b3;
+                    transform: translateY(-1px);
+                }
+
+                .button:active {
+                    transform: translateY(0);
+                }
+
+                .button.secondary {
+                    background: var(--input-background, rgba(0, 0, 0, 0.3));
+                    border: 1px solid var(--input-border, rgba(255, 255, 255, 0.2));
+                }
+
+                .button.secondary:hover {
+                    background: var(--input-hover-background, rgba(0, 0, 0, 0.4));
+                    border-color: var(--accent-color, #007aff);
+                }
+
+                @media (max-width: 400px) {
+                    .cell {
+                        width: 70px;
+                        height: 70px;
+                        font-size: 28px;
+                    }
+                }
+            `;
+
+            static properties = {
+                board: { type: Array },
+                currentPlayer: { type: String },
+                gameOver: { type: Boolean },
+                winner: { type: String },
+                winningCells: { type: Array },
+                scores: { type: Object },
+            };
+
+            constructor() {
+                super();
+                this.board = Array(9).fill(null);
+                this.currentPlayer = 'X';
+                this.gameOver = false;
+                this.winner = null;
+                this.winningCells = [];
+                this.scores = this.loadScores();
+            }
+
+            loadScores() {
+                const savedScores = localStorage.getItem('tictactoe-scores');
+                if (savedScores) {
+                    try {
+                        return JSON.parse(savedScores);
+                    } catch (e) {
+                        console.error('Failed to parse saved scores:', e);
+                    }
+                }
+                return { X: 0, O: 0, draws: 0 };
+            }
+
+            saveScores() {
+                localStorage.setItem('tictactoe-scores', JSON.stringify(this.scores));
+            }
+
+            checkWinner() {
+                const winPatterns = [
+                    [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+                    [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+                    [0, 4, 8], [2, 4, 6]             // Diagonals
+                ];
+
+                for (const pattern of winPatterns) {
+                    const [a, b, c] = pattern;
+                    if (this.board[a] &&
+                        this.board[a] === this.board[b] &&
+                        this.board[a] === this.board[c]) {
+                        return { winner: this.board[a], cells: pattern };
+                    }
+                }
+
+                if (this.board.every(cell => cell !== null)) {
+                    return { winner: 'draw', cells: [] };
+                }
+
+                return null;
+            }
+
+            handleCellClick(index) {
+                if (this.board[index] || this.gameOver) {
+                    return;
+                }
+
+                this.board = [...this.board];
+                this.board[index] = this.currentPlayer;
+
+                const result = this.checkWinner();
+                if (result) {
+                    this.gameOver = true;
+                    if (result.winner === 'draw') {
+                        this.winner = 'draw';
+                        this.scores.draws++;
+                    } else {
+                        this.winner = result.winner;
+                        this.winningCells = result.cells;
+                        this.scores[result.winner]++;
+                    }
+                    this.saveScores();
+                } else {
+                    this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
+                }
+            }
+
+            resetGame() {
+                this.board = Array(9).fill(null);
+                this.currentPlayer = 'X';
+                this.gameOver = false;
+                this.winner = null;
+                this.winningCells = [];
+            }
+
+            resetScores() {
+                this.scores = { X: 0, O: 0, draws: 0 };
+                this.saveScores();
+            }
+
+            getGameStatus() {
+                if (this.winner === 'draw') {
+                    return html`<span class="draw">It's a Draw!</span>`;
+                } else if (this.winner) {
+                    return html`<span class="winner">Player ${this.winner} Wins!</span>`;
+                } else {
+                    return html`Current Player: <strong>${this.currentPlayer}</strong>`;
+                }
+            }
+
+            render() {
+                return html`
+                    <div class="game-container">
+                        <div class="game-header">
+                            <div class="game-title">Tic-Tac-Toe</div>
+                            <div class="game-status">${this.getGameStatus()}</div>
+                        </div>
+
+                        <div class="game-board">
+                            ${this.board.map((cell, index) => html`
+                                <div
+                                    class="cell ${cell ? 'filled' : ''} ${cell?.toLowerCase() || ''} ${this.winningCells.includes(index) ? 'winner' : ''}"
+                                    @click=${() => this.handleCellClick(index)}
+                                >
+                                    ${cell || ''}
+                                </div>
+                            `)}
+                        </div>
+
+                        <div class="controls">
+                            <div class="scoreboard">
+                                <div class="score-item x">
+                                    <div class="score-label">Player X</div>
+                                    <div class="score-value">${this.scores.X}</div>
+                                </div>
+                                <div class="score-item">
+                                    <div class="score-label">Draws</div>
+                                    <div class="score-value">${this.scores.draws}</div>
+                                </div>
+                                <div class="score-item o">
+                                    <div class="score-label">Player O</div>
+                                    <div class="score-value">${this.scores.O}</div>
+                                </div>
+                            </div>
+
+                            <button class="button" @click=${this.resetGame}>
+                                New Game
+                            </button>
+
+                            <button class="button secondary" @click=${this.resetScores}>
+                                Reset Scores
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        customElements.define('tictactoe-view', TicTacToeView);
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Tic-Tac-Toe</h1>
+            <p>Built with Lit Web Components</p>
+        </div>
+        <tictactoe-view></tictactoe-view>
+    </div>
+</body>
+</html>
